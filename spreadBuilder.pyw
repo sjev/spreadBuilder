@@ -11,6 +11,7 @@ Project started on 08.02.2015
 """
 import sys
 from PyQt4 import QtGui
+from PyQt4.QtCore import Qt
 
 import widgets 
 
@@ -53,7 +54,7 @@ class MainWindow(QtGui.QMainWindow):
         
         #---- toolbar
         toolbar = self.addToolBar('tools')
-        toolbar.addAction(act_open)
+        toolbar.addAction(act_test)
         
         
         #---- statusbar
@@ -65,8 +66,12 @@ class MainWindow(QtGui.QMainWindow):
         lst.setSymbols(['SPY','VXX','AAPL'])      
         lst.addAction(act_useSymbol)
         
+        # spread dock
+        self.dock_spread = widgets.Dock('spread',self,widgets.SpreadWidget,area=Qt.RightDockWidgetArea)
+               
+        
         #-----prepare window
-        self.setGeometry(100, 100, 600, 300) # init position and size
+        self.setGeometry(100, 100, 800, 600) # init position and size
         self.setWindowTitle('SpreadBuilder v.' + __version__)    
         
 
@@ -79,7 +84,9 @@ class MainWindow(QtGui.QMainWindow):
 
     def test_fcn(self):
         """ dummy test function """
+        
         self.statusBar().showMessage('test')
+        self.dock_spread.widget().test() 
 
 
 def main():

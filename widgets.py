@@ -13,6 +13,9 @@ from PyQt4.QtGui import *
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
+from tradingWithPython_dev.lib import qtpandas
+
+from scratchpad import fakeData
 
 class Dock(QDockWidget):
     """ Simplified interface to QDockWidget.
@@ -24,18 +27,20 @@ class Dock(QDockWidget):
                  autoAddDock=True,
                  features=QDockWidget.AllDockWidgetFeatures):
         """ Constructor.
-
-        @param title dock title
-        @param parent ancestor widget
-        @param childType callable to produce child widget
-        @param area default dock area
-        @param allowedAreas dock widget allowed areas
-        @param autoAddDock if True, dock widget is added to parent
-        @param features dock widget features
+        
+        Parameters
+        ------------
+        title : dock title
+        parent : ancestor widget
+        childType : callable to produce child widget
+        area  : default dock area
+        allowedAreas : dock widget allowed areas
+        autoAddDock : if True, dock widget is added to parent
+        features : dock widget features
         """
         QDockWidget.__init__(self, title, parent)
         self.setObjectName(title)
-        self.setAllowedAreas(allowedAreas)
+        #self.setAllowedAreas(allowedAreas)
         self.setFeatures(features)
         self.setWidget(childType(self))
         if autoAddDock:
@@ -48,6 +53,7 @@ class SymbolsList(QListWidget):
     """
     def __init__(self, parent=None):
         QListWidget.__init__(self,parent)
+        self.setMaximumWidth(80)
         self.setContextMenuPolicy(Qt.ActionsContextMenu)
         
         
@@ -81,7 +87,7 @@ class PlotWidget(QWidget):
         
     def test(self):
         """ plot random data """
-        from scratchpad import fakeData
+        
         df = fakeData()
         
         #self.ax.hold(False) # discard old data
@@ -90,7 +96,25 @@ class PlotWidget(QWidget):
         df.plot(ax=self.ax)        
         
         self.canvas.draw()
-       
+
+class SpreadWidget(QWidget):
+    """ main widget for working with spreads """
+
+    def __init__(self,parent):
+        super(SpreadWidget,self).__init__(parent)
+        
+        self.table = qtpandas.DataFrameWidget(self)
+        
+        self.plot = PlotWidget(self)
+
+        layout = QVBoxLayout()
+        #layout.addWidget(self.table)
+        layout.addWidget(self.plot)
+        self.setLayout(layout)       
+        
+    def test(self):
+        self.plot.test()
+        
    
 # --------------------------- test code -------------------------------
 
@@ -98,7 +122,7 @@ class MainWindow(QDialog):
     
     def __init__(self):
         super(MainWindow, self).__init__()
-        widget = PlotWidget(self)
+        widget = SpreadWidget(self)
         button = QPushButton('Test')
         button.clicked.connect(widget.test)
         
